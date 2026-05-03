@@ -1,7 +1,6 @@
 import { describe, it, expect } from "vitest"
 import { counters } from "@/db/schema"
 import { counterSelectSchema } from "@/db/zod-schemas"
-import { generateValidRow } from "./helpers/schema-test-utils"
 
 describe("counters schema", () => {
 	it("has the expected columns", () => {
@@ -22,8 +21,7 @@ describe("counters schema", () => {
 	})
 
 	it("Zod schema validates a valid row", () => {
-		const row = generateValidRow(counterSelectSchema)
-		const result = counterSelectSchema.safeParse(row)
+		const result = counterSelectSchema.safeParse({ id: "global", value: 0, updatedAt: new Date() })
 		expect(result.success).toBe(true)
 	})
 

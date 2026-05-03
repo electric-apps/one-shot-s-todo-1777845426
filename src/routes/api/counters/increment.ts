@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router"
 import { db } from "@/db/index"
 import { counters } from "@/db/schema"
-import { sql } from "drizzle-orm"
+import { eq, sql } from "drizzle-orm"
 import { generateTxId } from "@/db/utils"
 
 export const Route = createFileRoute("/api/counters/increment")({
@@ -23,7 +23,7 @@ export const Route = createFileRoute("/api/counters/increment")({
 					const [row] = await tx
 						.select()
 						.from(counters)
-						.where(sql`${counters.id} = 'global'`)
+						.where(eq(counters.id, "global"))
 
 					const txid = await generateTxId(tx)
 					return { value: row.value, txid }
