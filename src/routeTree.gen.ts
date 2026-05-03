@@ -10,33 +10,74 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiCountersRouteImport } from './routes/api/counters'
+import { Route as ApiCountersIncrementRouteImport } from './routes/api/counters/increment'
+import { Route as ApiCountersDecrementRouteImport } from './routes/api/counters/decrement'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiCountersRoute = ApiCountersRouteImport.update({
+  id: '/api/counters',
+  path: '/api/counters',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCountersIncrementRoute = ApiCountersIncrementRouteImport.update({
+  id: '/increment',
+  path: '/increment',
+  getParentRoute: () => ApiCountersRoute,
+} as any)
+const ApiCountersDecrementRoute = ApiCountersDecrementRouteImport.update({
+  id: '/decrement',
+  path: '/decrement',
+  getParentRoute: () => ApiCountersRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/api/counters': typeof ApiCountersRouteWithChildren
+  '/api/counters/decrement': typeof ApiCountersDecrementRoute
+  '/api/counters/increment': typeof ApiCountersIncrementRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/api/counters': typeof ApiCountersRouteWithChildren
+  '/api/counters/decrement': typeof ApiCountersDecrementRoute
+  '/api/counters/increment': typeof ApiCountersIncrementRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/api/counters': typeof ApiCountersRouteWithChildren
+  '/api/counters/decrement': typeof ApiCountersDecrementRoute
+  '/api/counters/increment': typeof ApiCountersIncrementRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/api/counters'
+    | '/api/counters/decrement'
+    | '/api/counters/increment'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/api/counters'
+    | '/api/counters/decrement'
+    | '/api/counters/increment'
+  id:
+    | '__root__'
+    | '/'
+    | '/api/counters'
+    | '/api/counters/decrement'
+    | '/api/counters/increment'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ApiCountersRoute: typeof ApiCountersRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +89,47 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/counters': {
+      id: '/api/counters'
+      path: '/api/counters'
+      fullPath: '/api/counters'
+      preLoaderRoute: typeof ApiCountersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/counters/increment': {
+      id: '/api/counters/increment'
+      path: '/increment'
+      fullPath: '/api/counters/increment'
+      preLoaderRoute: typeof ApiCountersIncrementRouteImport
+      parentRoute: typeof ApiCountersRoute
+    }
+    '/api/counters/decrement': {
+      id: '/api/counters/decrement'
+      path: '/decrement'
+      fullPath: '/api/counters/decrement'
+      preLoaderRoute: typeof ApiCountersDecrementRouteImport
+      parentRoute: typeof ApiCountersRoute
+    }
   }
 }
 
+interface ApiCountersRouteChildren {
+  ApiCountersDecrementRoute: typeof ApiCountersDecrementRoute
+  ApiCountersIncrementRoute: typeof ApiCountersIncrementRoute
+}
+
+const ApiCountersRouteChildren: ApiCountersRouteChildren = {
+  ApiCountersDecrementRoute: ApiCountersDecrementRoute,
+  ApiCountersIncrementRoute: ApiCountersIncrementRoute,
+}
+
+const ApiCountersRouteWithChildren = ApiCountersRoute._addFileChildren(
+  ApiCountersRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ApiCountersRoute: ApiCountersRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
